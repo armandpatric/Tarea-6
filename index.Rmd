@@ -1,0 +1,352 @@
+---
+title: "AFDMD-111 Estadística"
+author: "Julio César Ramírez Pacheco"
+date: "09/10/2023"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+    cards: no
+subtitle: Cálculo de probabilidad de VAs
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Variables aleatorias discretas
+
+Como se ha mencionado en clases pasadas existen tres tipos de variables aleatorias; discretas, continuas y mixtas. Para nuestro curso, estaremos interesados en las variables aleatorias discretas y continuas. Recordemos que para las variables aleatorias discretas contamos con dos funciones que las describen totalmente; la función de distribución y la función de densidad.
+La función de distribución está dada por:
+$$
+F_X(x) = P(X \le x)
+$$
+para cualquier valor $x \in \mathbb{R}$. La función de masa de probabilidad es la otra función que se define de la siguiente manera:
+$$
+p_X(k) = P(X=k)
+$$
+Por lo tanto, cuando se nos dá una variable aleatoria discreta ésta está definida por una fórmula que representa $p_X(k)$ o $F_X(x)$. La variable aleatoria binomial, por ejemplo está dada por:
+$$
+p_X(k) = \binom{n}{k}p^k(1-p)^{n-k}\; \;\;\; k=0,1,2, \ldots n
+$$
+En R, los comandos `dbinom, pbinom, rbinom` y `qbinom` generan las pmfs, distribuciones y números aleatorios relacionados a la variable aleatoria discreta Binomial. Por ejemplo, el siguiente código genera $100$ números aleatorios de una distriubción binomial con parámetros $n=16$, $p=0.1$ y posteriormente se grafican.
+
+```{r binRV, fig.width= 6, fig.height=3.4}
+vars <-rbinom(100, size=16, prob=0.1)
+plot(vars, type="l", main="Números binomiales", xlab="iteración", ylab="Valores")
+```
+
+## Actividad
+Investigue la generación de *pmfs* y *cdfs* discretas en R o python y posteriormente calcule las siguientes probabilidades usando únicamente código:
+
+#### Investigación: 
+#Borrar
+En R, para trabajar con funciones de masa de probabilidad (PMFs) y funciones de distribución acumulativa (CDFs) de distribuciones discretas, como la distribución binomial, puedes utilizar funciones específicas de la librería base de R.
+
+1. Sea $X$ una variable aleatoria que tiene distribución binomial con $p=0.4$ y $n=20$. Calcular:
+a. $P(X\le 6)$
+```{r}
+p <- 0.4
+n <- 20
+probabilidad <- pbinom(6, size = n, prob = p)
+cat("P(X ≤ 6) =", probabilidad, "\n")
+```
+b. $P(X\ge 12)$
+```{r}
+p <- 0.4
+n <- 20
+probabilidad_geq_12 <- 1 - pbinom(11, size = n, prob = p)
+cat("P(X ≥ 12) =", probabilidad_geq_12, "\n")
+```
+c. $P(X=8)$
+```{r}
+p <- 0.4
+n <- 20
+probabilidad_eq_8 <- dbinom(8, size = n, prob = p)
+cat("P(X = 8) =", probabilidad_eq_8, "\n")
+```
+
+2. El comando `sample`, me permite generar números aleatorios con una *pmf* que define el usuario. Generar 100 números aleatorios con las siguientes pmfs:
+a. $p_X(k) = {5\choose k}\left(\frac{1}{5}\right)^k \left(\frac{4}{5}\right)^{5-k}, \;\; k=0,1,2,3,4,5.$
+```{r}
+set.seed(1)
+x<-sample(c(1,2), size = 100, replace = TRUE) # Vector de 20 elementos
+x
+```
+
+b. $p_X(k) = \frac{k^2}{2870}, \;\; k=0,1,2,3,\ldots, 19, 20$
+```{r}
+pmf_a <- function(k) {
+  return(k^2 / 2870)}
+muestra_a <- sample(0:20, 100, replace = TRUE, prob = pmf_a(0:20))
+print(muestra_a)
+```
+
+c. $p_X(k) = \log_{10}\left(\frac{k+1}{k}\right)\; \; k=1,2,3, \ldots 9$
+```{r}
+pmf_b <- function(k) {
+  return(log10((k + 1) / k))
+}
+muestra_b <- sample(1:9, 100, replace = TRUE, prob = pmf_b(1:9))
+print(muestra_b)
+```
+
+
+
+
+3. La variable aleatoria binomial depende de los parámetros $n$ y $p$. Grafique las pmfs y cdfs para (Nota para graficar por parejas puede usar el comando `par(mfrow=(filas, columnas))`) y responda las preguntas:
+
+ a. $n=10$ y $p=1/2$
+```{r}
+n_a <- 10
+p_a <- 1/2
+pmf_a <- dbinom(0:n_a, size = n_a, prob = p_a)
+barplot(pmf_a, names.arg = 0:n_a, col = "blue", main = paste("PMF - n =", n_a, ", p =", p_a), xlab = "k", ylab = "Probabilidad")
+cdf_a <- pbinom(0:n_a, size = n_a, prob = p_a)
+plot(0:n_a, cdf_a, type = "s", col = "red", main = paste("CDF - n =", n_a, ", p =", p_a), xlab = "k", ylab = "Probabilidad acumulada")
+```
+ 
+ b. $n=10$ y $p=1/8$
+```{r}
+n_b <- 10
+p_b <- 1/8
+pmf_b <- dbinom(0:n_b, size = n_b, prob = p_b)
+barplot(pmf_b, names.arg = 0:n_b, col = "blue", main = paste("PMF - n =", n_b, ", p =", p_b), xlab = "k", ylab = "Probabilidad")
+cdf_b <- pbinom(0:n_b, size = n_b, prob = p_b)
+plot(0:n_b, cdf_b, type = "s", col = "red", main = paste("CDF - n =", n_b, ", p =", p_b), xlab = "k", ylab = "Probabilidad acumulada")
+```
+ 
+ c. $n=10$ y $4/5$
+```{r}
+n_c <- 10
+p_c <- 4/5
+pmf_c <- dbinom(0:n_c, size = n_c, prob = p_c)
+barplot(pmf_c, names.arg = 0:n_c, col = "blue", main = paste("PMF - n =", n_c, ", p =", p_c), xlab = "k", ylab = "Probabilidad")
+cdf_c <- pbinom(0:n_c, size = n_c, prob = p_c)
+plot(0:n_c, cdf_c, type = "s", col = "red", main = paste("CDF - n =", n_c, ", p =", p_c), xlab = "k", ylab = "Probabilidad acumulada")
+```
+ 
+ d. $n=10$ y $p=1/2$
+```{r}
+n_d <- 10
+p_d <- 1/2
+pmf_d <- dbinom(0:n_d, size = n_d, prob = p_d)
+barplot(pmf_d, names.arg = 0:n_d, col = "blue", main = paste("PMF - n =", n_d, ", p =", p_d), xlab = "k", ylab = "Probabilidad")
+cdf_d <- pbinom(0:n_d, size = n_d, prob = p_d)
+plot(0:n_d, cdf_d, type = "s", col = "red", main = paste("CDF - n =", n_d, ", p =", p_d), xlab = "k", ylab = "Probabilidad acumulada")
+```
+
+ 
+ e. ¿Tiene algún efecto $n$ y $p$ para que la pmf sea simétrica? ¿Cuál?
+
+Sí, la simetría de la pmf de una distribución binomial está influenciada principalmente por el parámetro $p$. La pmf de una distribución binomial es simétrica si $p = 0.5$, independientemente del valor de n. Cuando $p = 0.5$, las probabilidades de éxito y fracaso son iguales, lo que resulta en una distribución simétrica alrededor de su valor esperado.
+ 
+ f. ¿Qué efecto tiene $p$ en la asimetría?
+ 
+ El parámetro $p$ tiene un efecto significativo en la asimetría de la distribución binomial. Cuanto más se aleje $p$ de 0.5, mayor será la asimetría en la dirección opuesta a $p$.
+
+- Si $p$ es cercano a 0, la distribución será asimétrica hacia la derecha (cola derecha pesada).
+- Si $p$ es cercano a 1, la distribución será asimétrica hacia la izquierda (cola izquierda pesada).
+ 
+# Variables aletorias continuas
+
+Las variables aleatorias continuas, a diferencia de las discretas, quedan totalmente definidas mediante su PDF y CDF. Existen múltiples variables aleatorias bien conocidas y que sirven para modelar diversos fenómenos. La densidad Gamma está dada por la siguiente ecuación:
+$$
+f_X(x, \alpha, \beta) = \begin{cases}
+\frac{\beta^{\alpha}}{\Gamma(\alpha)} x^{\alpha-1} \mbox{e}^{-\beta x} & x>0\\
+0 & x\le 0
+\end{cases}
+$$
+donde $\alpha>0$ y $\beta >0$.
+
+## Actividad
+1. ¿Qué efecto tiene incrementar $\alpha$? Grafique para contestar.
+```{r}
+gamma_pdf <- function(x, alpha, beta) {
+  return((beta^alpha / gamma(alpha)) * x^(alpha - 1) * exp(-beta * x))
+}
+x_values <- seq(0, 5, length.out = 100)
+alpha_values <- c(1, 2, 3, 4)
+par(mfrow = c(2, 2))
+
+for (alpha in alpha_values) {
+  pdf_values <- gamma_pdf(x_values, alpha, 1)
+  plot(x_values, pdf_values, type = "l", main = paste("PDF Gamma - alpha =", alpha), xlab = "x", ylab = "f(x)")
+}
+
+par(mfrow = c(1, 1))
+```
+
+2. ¿Qué efecto tiene $\beta$ en la forma de la densidad? Grafique para contestar.
+```{r}
+gamma_pdf_beta <- function(x, alpha, beta) {
+  return((beta^alpha / gamma(alpha)) * x^(alpha - 1) * exp(-beta * x))
+}
+beta_values <- c(0.5, 1, 1.5, 2)
+par(mfrow = c(2, 2))
+
+for (beta in beta_values) {
+  pdf_values <- gamma_pdf_beta(x_values, 2, beta)
+  plot(x_values, pdf_values, type = "l", main = paste("PDF Gamma - beta =", beta), xlab = "x", ylab = "f(x)")
+}
+
+par(mfrow = c(1, 1))
+```
+
+
+Otra variable aleatoria de interés es la variable aleatoria de Cauchy que está definida de la siguiente manera:
+
+$$
+f_X(x) = \frac{\beta}{\pi ([x-\alpha]^2 + \beta^2)}
+$$
+donde $\alpha \in \mathbb{R}$ y $\beta >0$. Supógamos que $\alpha = 5$.
+
+## Actividad
+
+1. ¿Qué efecto tiene $\beta$ en la función de densidad? Grafique para contestar.
+
+```{r}
+cauchy_pdf <- function(x, alpha, beta) {
+  return(beta / (pi * ((x - alpha)^2 + beta^2)))
+}
+x_values_cauchy <- seq(-10, 20, length.out = 1000)
+beta_values_cauchy <- c(1, 2, 5)
+par(mfrow = c(2, 2))
+
+for (beta_cauchy in beta_values_cauchy) {
+  pdf_values_cauchy <- cauchy_pdf(x_values_cauchy, 5, beta_cauchy)
+  plot(x_values_cauchy, pdf_values_cauchy, type = "l", main = paste("PDF Cauchy - beta =", beta_cauchy), xlab = "x", ylab = "f(x)")
+}
+par(mfrow = c(1, 1))
+
+```
+
+
+
+Supóngamos que tenemos la siguiente PDF:
+$$
+f_X(x) = \begin{cases}
+0 & x < a\\
+\frac{2(x-a)}{(b-a)(c-a)} & a \le x < c\\
+\frac{2}{b-a} & x=c\\
+\frac{2(b-x)}{(b-a)(b-c)} & c < x \le b\\
+0 & b < x
+\end{cases}
+$$
+donde $a < c < c$.
+
+
+## Actividad
+1. Grafique la densidad triangular cuando $a=0$, $b=4$, $c=2$
+```{r}
+triangular_pdf <- function(x, a, b, c) {
+  if (x < a || x > b) return(0)
+  else if (a <= x && x < c) return(2 * (x - a) / ((b - a) * (c - a)))
+  else if (x == c) return(2 / (b - a))
+  else if (c < x && x <= b) return(2 * (b - x) / ((b - a) * (b - c)))
+}
+x_values_triangular <- seq(-1, 5, length.out = 1000)
+pdf_values_1 <- sapply(x_values_triangular, function(x) triangular_pdf(x, 0, 4, 2))
+plot(x_values_triangular, pdf_values_1, type = "l", main = "Densidad Triangular - Caso 1", xlab = "x", ylab = "f(x)")
+```
+
+
+2. Grafique la densidad triangular cuando $a=1$, $c=2$, $b=4$
+```{r}
+triangular_pdf <- function(x, a, b, c) {
+  if (x < a || x > b) return(0)
+  else if (a <= x && x < c) return(2 * (x - a) / ((b - a) * (c - a)))
+  else if (x == c) return(2 / (b - a))
+  else if (c < x && x <= b) return(2 * (b - x) / ((b - a) * (b - c)))
+}
+x_values_triangular <- seq(-1, 5, length.out = 1000)
+pdf_values_2 <- sapply(x_values_triangular, function(x) triangular_pdf(x, 1, 4, 2))
+plot(x_values_triangular, pdf_values_2, type = "l", main = "Densidad Triangular - Caso 2", xlab = "x", ylab = "f(x)")
+```
+
+
+3. Grafique la densidad triangular cuando $a=-1$, $c=0$, $b=1$
+```{r}
+triangular_pdf <- function(x, a, b, c) {
+  if (x < a || x > b) return(0)
+  else if (a <= x && x < c) return(2 * (x - a) / ((b - a) * (c - a)))
+  else if (x == c) return(2 / (b - a))
+  else if (c < x && x <= b) return(2 * (b - x) / ((b - a) * (b - c)))
+}
+x_values_triangular <- seq(-1, 5, length.out = 1000)
+pdf_values_3 <- sapply(x_values_triangular, function(x) triangular_pdf(x, -1, 1, 0))
+plot(x_values_triangular, pdf_values_3, type = "l", main = "Densidad Triangular - Caso 3", xlab = "x", ylab = "f(x)")
+```
+
+
+
+Tanto `R` como `python` nos permiten calcular integrales usando los comandos básicos o bién usando sistemas de cómputo algebraíco. R, por ejemplo, puede utilizar un sistema llamado `Ryacas` que permite hacer muchos cálculos de forma simbólica. Ahora, consideremos que tenemos la siguiente PDF:
+
+$$
+f_X(x) = \begin{cases}
+\mbox{e}^{-x} & x \ge 0\\
+0 & \mbox{resto}
+\end{cases}
+$$
+
+## Actividad
+
+Calcular, usando los comando de integración o `Ryacas` o `python` las siguientes probabilidades usando la PDF de arriba:
+
+1. $P(X>1)$
+```{r}
+fx <- function(x) {
+  ifelse(x >= 0, exp(-x), 0)
+}
+probabilidad_1 <- integrate(fx, lower = 1, upper = Inf)$value
+cat("1. P(X > 1):", probabilidad_1, "\n")
+```
+
+
+2. $P(2 < X \le 4)$
+```{r}
+probabilidad_2 <- integrate(fx, lower = 2, upper = 4)$value
+cat("2. P(2 < X <= 4):", probabilidad_2, "\n")
+```
+
+3. $P(X \le 2)$
+```{r}
+probabilidad_3 <- integrate(fx, lower = -Inf, upper = 2)$value
+cat("3. P(X <= 2):", probabilidad_3, "\n")
+```
+
+
+Finalmente, supongamos que tenemos la siguiente PDF:
+
+$$
+f_X(x) = \frac{1}{\sqrt{2\pi}}\mbox{e}^{-\frac{(x-3)^2}{2}}
+$$
+
+## Actividad
+
+1. Graficar $f_X(3+x)$.
+```{r}
+fx <- function(x) {
+  return (1 / sqrt(2 * pi) * exp(-((x - 3)^2) / 2))
+}
+x_values_1 <- seq(-10, 10, length.out = 1000)
+y_values_1 <- fx(3 + x_values_1)
+plot(x_values_1, y_values_1, type = "l", main = expression(f[x](3 + x)), xlab = "x", ylab = expression(f[x](3 + x)))
+```
+
+
+2. Graficar $f_X(3-x)$.
+```{r}
+x_values_2 <- seq(-10, 10, length.out = 1000)
+y_values_2 <- fx(3 - x_values_2)
+plot(x_values_2, y_values_2, type = "l", main = expression(f[x](3 - x)), xlab = "x", ylab = expression(f[x](3 - x)))
+```
+
+
+3. Que hay en común entre estas dos gráficas y qué se puede inferir de $f_X(3+x)$ y $f_X(3-x)$
+
+
+Ambas gráficas son simétricas con respecto al eje vertical $x=3$, ya que $fX (3+x)$ y $fx(3-x)$ representan desplazamientos opuestos de la función de densidad de probabilidad $fx(x)$ original. representan desplazamientos opuestos de la función de densidad de probabilidad $x = 3$, y el término $(x - 3)^2$ en el exponente contribuye a esta simetría.
+ 
+
+## Fecha de entrega: miércoles 18 de octubre de 2023 a través de Moodle. 
